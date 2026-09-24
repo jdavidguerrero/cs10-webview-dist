@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Actualización WebView CS10</title>
+<style>
+  :root{
+    --paper:      #f3f5f6;
+    --surface:    #ffffff;
+    --surface-2:  #eceef1;
+    --ink:        #13181c;
+    --ink-2:      #4c5560;
+    --ink-muted:  #8993a0;
+    --border:     rgba(19,24,28,0.12);
+    --accent:     #ff6a1a;
+    --accent-ink: #7a2900;
+    --accent-soft:#ffe3cf;
+    --good:       #157f3c;
+    --good-soft:  #dcf5e6;
+    --warn:       #b45300;
+    --warn-soft:  #fff1dc;
+    --shadow: 0 1px 2px rgba(19,24,28,0.06), 0 8px 24px -12px rgba(19,24,28,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:      #0e1113;
+      --surface:    #181c1f;
+      --surface-2:  #202528;
+      --ink:        #f2f3f4;
+      --ink-2:      #b7bec6;
+      --ink-muted:  #7c8590;
+      --border:     rgba(255,255,255,0.12);
+      --accent:     #ff7a2e;
+      --accent-ink: #ffd9bd;
+      --accent-soft:#3a2110;
+      --good:       #3ecb7a;
+      --good-soft:  #123723;
+      --warn:       #ffb454;
+      --warn-soft:  #3a2a0d;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:      #0e1113;
+    --surface:    #181c1f;
+    --surface-2:  #202528;
+    --ink:        #f2f3f4;
+    --ink-2:      #b7bec6;
+    --ink-muted:  #7c8590;
+    --border:     rgba(255,255,255,0.12);
+    --accent:     #ff7a2e;
+    --accent-ink: #ffd9bd;
+    --accent-soft:#3a2110;
+    --good:       #3ecb7a;
+    --good-soft:  #123723;
+    --warn:       #ffb454;
+    --warn-soft:  #3a2a0d;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Public Sans","Segoe UI",system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{ max-width:100%; }
+  .mono{ font-family:"JetBrains Mono",ui-monospace,"SF Mono",Consolas,monospace; font-variant-numeric:tabular-nums; }
+
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:28px 20px 48px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .eyebrow{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    background:var(--accent-soft);
+    padding:5px 10px;
+    border-radius:3px;
+    width:fit-content;
+  }
+  h1{
+    font-family:"Archivo",system-ui,sans-serif;
+    font-weight:800;
+    font-size:clamp(30px,8vw,40px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:2px 0 0;
+    text-wrap:balance;
+  }
+  .dek{
+    margin:0;
+    font-size:15.5px;
+    color:var(--ink-2);
+    max-width:44ch;
+  }
+
+  .banner{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    border-radius:6px;
+    padding:12px 14px;
+    font-size:13.5px;
+    font-weight:600;
+    border:1px solid transparent;
+  }
+  .banner.warn{ background:var(--warn-soft); color:var(--warn); border-color:color-mix(in srgb, var(--warn) 30%, transparent); }
+
+  .spec-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:6px 4px;
+    box-shadow:var(--shadow);
+  }
+  .spec-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:12px;
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  .spec-row:last-child{ border-bottom:none; }
+  .spec-k{ font-size:12px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.04em; }
+  .spec-v{ font-size:13.5px; font-weight:600; text-align:right; overflow-wrap:anywhere; }
+  .spec-v.good{ color:var(--good); }
+
+  .cta{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    width:100%;
+    min-height:72px;
+    background:var(--accent);
+    color:#fff;
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    padding:14px 18px;
+    box-shadow:var(--shadow);
+    transition:transform .1s ease, filter .15s ease;
+  }
+  .cta:hover{ filter:brightness(1.05); }
+  .cta:active{ transform:scale(0.98); }
+  .cta:disabled{ background:var(--surface-2); color:var(--ink-muted); box-shadow:none; cursor:not-allowed; }
+  .cta:focus-visible{ outline:3px solid var(--accent-ink); outline-offset:2px; }
+  .cta-label{ font-family:"Archivo",sans-serif; font-weight:700; font-size:19px; }
+  .cta-sub{ font-size:12.5px; opacity:.9; font-weight:500; }
+
+  .fallback-note{ margin:-8px 0 0; font-size:13px; color:var(--ink-muted); text-align:center; }
+  .fallback-note a{ color:var(--accent-ink); font-weight:700; text-decoration:underline; }
+
+  .steps-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 18px 16px;
+    box-shadow:var(--shadow);
+  }
+  .steps-card h2{
+    font-family:"Archivo",sans-serif;
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 12px;
+  }
+  .steps{ counter-reset:step; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .steps li{
+    counter-increment:step;
+    position:relative;
+    padding-left:34px;
+    font-size:14px;
+    color:var(--ink-2);
+  }
+  .steps li b{ color:var(--ink); }
+  .steps li code{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12.5px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:1px 5px;
+  }
+  .steps li::before{
+    content:counter(step);
+    position:absolute; left:0; top:-1px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:var(--accent-ink);
+    font-family:"JetBrains Mono",monospace;
+    font-size:11.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  details.help{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:4px 4px;
+  }
+  details.help summary{
+    cursor:pointer;
+    padding:14px 16px;
+    font-size:14px;
+    font-weight:700;
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  details.help summary::-webkit-details-marker{ display:none; }
+  details.help summary::after{
+    content:"+";
+    font-family:"Archivo",sans-serif;
+    font-size:18px;
+    color:var(--ink-muted);
+    flex-shrink:0;
+  }
+  details.help[open] summary::after{ content:"–"; }
+  details.help p, details.help ul{
+    margin:0 16px 14px;
+    font-size:13.5px;
+    color:var(--ink-2);
+    max-width:60ch;
+  }
+  details.help ul{ padding-left:18px; }
+  details.help li{ margin-bottom:8px; }
+  details.help code{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:1px 5px;
+  }
+
+  .qr-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    text-align:center;
+  }
+  #qr{
+    background:#fff;
+    padding:10px;
+    border-radius:8px;
+    line-height:0;
+  }
+  .qr-caption{ margin:0; font-size:12.5px; color:var(--ink-muted); max-width:32ch; }
+
+  .foot{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-muted);
+    padding-top:4px;
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Actualización de terminal</span>
+  <h1>WebView<br>Ciontek CS10</h1>
+  <p class="dek">Toca el botón. La descarga empieza sola — cuando termine, instala en 2 toques. Sin cable, sin computador.</p>
+
+  <section class="spec-card">
+    <div class="spec-row"><span class="spec-k">Paquete</span><span class="spec-v mono">com.google.android.webview</span></div>
+    <div class="spec-row"><span class="spec-k">Versión</span><span class="spec-v mono">107.0.5304.54</span></div>
+    <div class="spec-row"><span class="spec-k">Tamaño</span><span class="spec-v mono">105 MB</span></div>
+    <div class="spec-row"><span class="spec-k">Firma</span><span class="spec-v good">Google Inc. ✓ verificada</span></div>
+  </section>
+
+  <button id="dl-btn" class="cta" type="button">
+    <span class="cta-label">Descargar ahora</span>
+    <span class="cta-sub">Empieza sola al abrir esta página</span>
+  </button>
+  <p id="dl-fallback" class="fallback-note" hidden>¿No empezó sola? <a id="dl-link" href="#">Toca aquí para descargar</a>.</p>
+
+  <section class="steps-card">
+    <h2>Cuando termine de bajar</h2>
+    <ol class="steps">
+      <li>Abre la notificación de descarga, o busca <code>webview.apk</code> en la carpeta <b>Descargas</b>.</li>
+      <li>Si Android pregunta por instalar de <b>fuentes desconocidas</b>, permite esta vez.</li>
+      <li>Toca <b>Instalar</b> y espera — puede tardar varios minutos, es normal.</li>
+      <li>Cuando diga <b>Listo</b>, cierra sin abrir la app. Ya quedó actualizado.</li>
+    </ol>
+  </section>
+
+  <details class="help">
+    <summary>¿La instalación también puede ser automática?</summary>
+    <p>No. Android exige que alguien toque "Instalar" para cualquier app que llegue por el navegador — es una protección del sistema operativo, ninguna página web puede saltársela. La descarga sí puede empezar sola; instalar quedan en 1-2 toques, sin cable y sin técnico especializado.</p>
+    <p>La única forma de llegar a cero toques es inscribir las terminales en un MDM (Android Enterprise / Device Owner) que empuje la instalación de forma silenciosa, o una app propia instalada una vez que dispare el instalador automáticamente al terminar de bajar — ambas son proyectos aparte, más grandes que este link.</p>
+  </details>
+
+  <details class="help">
+    <summary>Errores comunes</summary>
+    <ul>
+      <li><b>"App no instalada" / error de firma</b> — el archivo del servidor no es el mismo build de Google que ya está en la terminal. Hay que reemplazar el APK hosteado, no editarlo.</li>
+      <li><b>Solo abre el navegador, no ofrece instalar</b> — el servidor no está sirviendo el archivo como descarga. Revisar que envíe <code>Content-Type: application/vnd.android.package-archive</code> y <code>Content-Disposition: attachment</code>.</li>
+      <li><b>No aparece notificación ni forma de abrir el archivo descargado</b> — el navegador de esa terminal no expone gestor de descargas. Revisar si hay una app de Archivos/Mis Archivos en el menú, o si el propio navegador tiene una página de "Descargas" (ej. <code>chrome://downloads</code>).</li>
+      <li><b>Se queda "instalando" varios minutos</b> — normal. ~10 min es el tiempo real que tarda el chip del CS10 en verificar e instalar el WebView, no está trabado.</li>
+    </ul>
+  </details>
+
+  <section class="qr-card">
+    <div id="qr"></div>
+    <p class="qr-caption">Comparte este QR — abre esta misma página en cualquier terminal.</p>
+  </section>
+
+  <p class="foot">Ciontek CS10 · MT6737M · Flota de 1500 unidades</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var APK_URL = "https://github.com/jdavidguerrero/cs10-webview-dist/releases/download/v107.0.5304.54/webview.apk";
+
+  var btn = document.getElementById('dl-btn');
+  var fallback = document.getElementById('dl-fallback');
+  var link = document.getElementById('dl-link');
+
+  link.href = APK_URL;
+  var triggered = false;
+  var startDownload = function () {
+    if (triggered) return;
+    triggered = true;
+    window.location.href = APK_URL;
+    fallback.hidden = false;
+  };
+  btn.addEventListener('click', startDownload);
+  setTimeout(startDownload, 700);
+
+  try {
+    new QRCode(document.getElementById('qr'), {
+      text: window.location.href,
+      width: 156,
+      height: 156,
+      colorDark: '#13181c',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
