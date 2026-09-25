@@ -272,6 +272,15 @@
     line-height:0;
   }
   .qr-caption{ margin:0; font-size:12.5px; color:var(--ink-muted); max-width:32ch; }
+  .short-url{
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.01em;
+    color:var(--accent-ink);
+    background:var(--accent-soft);
+    padding:6px 12px;
+    border-radius:6px;
+  }
 
   .foot{
     text-align:center;
@@ -333,7 +342,8 @@
 
   <section class="qr-card">
     <div id="qr"></div>
-    <p class="qr-caption">Comparte este QR — abre esta misma página en cualquier terminal.</p>
+    <p class="qr-caption">Comparte este QR, o si el escáner no lo lee, teclea en el navegador:</p>
+    <p class="short-url mono">tinyurl.com/cs10webview</p>
   </section>
 
   <p class="foot">Ciontek CS10 · MT6737M · Flota de 1500 unidades</p>
